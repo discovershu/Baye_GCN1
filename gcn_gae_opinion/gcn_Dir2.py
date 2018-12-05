@@ -46,6 +46,7 @@ dataset_str = FLAGS.dataset
 seed = 1234
 np.random.seed(seed)
 tf.set_random_seed(seed)
+print(seed)
 # Load data5
 # adj, features = load_data(dataset_str)
 adj, features = load_data_sub()
