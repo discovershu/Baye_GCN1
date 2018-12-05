@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="xz381633@ceashpc-12.rit.albany.edu:22" autoUploadExternalChanges="true">
+    <serverData>
+      <paths name="xz381633@ceashpc-07.rit.albany.edu:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/network/rit/lab/ceashpc/xujiang/project/Baye_GCN1" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="xz381633@ceashpc-12.rit.albany.edu:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/network/rit/lab/ceashpc/xujiang/project/Baye_GCN1" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>
