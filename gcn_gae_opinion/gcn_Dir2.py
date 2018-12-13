@@ -22,7 +22,7 @@ from gcn_gae_opinion.metrics import masked_dir_error, masked_dir_error2
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 flags.DEFINE_float('learning_rate', 0.001, 'Initial learning rate.')
-flags.DEFINE_integer('epochs', 1200, 'Number of epochs to train.')
+flags.DEFINE_integer('epochs', 500, 'Number of epochs to train.')
 flags.DEFINE_integer('hidden1', 32, 'Number of units in hidden layer 1.')
 flags.DEFINE_integer('hidden2', 1, 'Number of units in hidden layer 2, P in our paper.')
 flags.DEFINE_float('weight_decay', 0., 'Weight for L2 loss on embedding matrix.')
@@ -37,8 +37,8 @@ flags.DEFINE_integer('features', 0, 'Whether to use features (1) or not (0).')
 flags.DEFINE_float('p_encode', 0.01, 'trade off parameter of auto_encode.')
 flags.DEFINE_float('p_kl', 0.01, 'trade off parameter of KL-divergence.')
 flags.DEFINE_integer('KL_m', 10, 'approximate of the infinite sum in KLD.')
-flags.DEFINE_float('test_rat', 0.6, 'test number of dataset.')
-flags.DEFINE_integer('T', 38, 'time winidow.')
+flags.DEFINE_float('test_rat', 0.2, 'test number of dataset.')
+flags.DEFINE_integer('T', 6, 'time winidow.')
 
 model_str = FLAGS.model
 dataset_str = FLAGS.dataset
@@ -56,7 +56,7 @@ adj_orig = adj_orig - sp.dia_matrix((adj_orig.diagonal()[np.newaxis, :], [0]), s
 adj_orig.eliminate_zeros()
 adj_train = adj
 
-label_1, label_2, label_3, train_mask, test_mask, uncertainty = mask_test_syn_sub_dif2(FLAGS.test_rat, T=FLAGS.T)
+label_1, label_2, label_3, train_mask, test_mask, uncertainty = mask_test_syn_sub_dif2(FLAGS.test_rat, T=FLAGS.T, seed=0)
 
 if FLAGS.features == 0:
     features = sp.identity(label_1.shape[0])  # featureless
@@ -117,7 +117,7 @@ adj_label = sparse_to_tuple(adj_label)
 result = []
 for k in range(10):
     sess.run(tf.global_variables_initializer())
-    label_1, label_2, label_3, train_mask, test_mask, uncertainty = mask_test_syn_sub_dif2(FLAGS.test_rat, T=k)
+    label_1, label_2, label_3, train_mask, test_mask, uncertainty = mask_test_syn_sub_dif2(FLAGS.test_rat, T=FLAGS.T, seed=k)
     for epoch in range(FLAGS.epochs):
         t = time.time()
         # Construct feed dictionary
@@ -137,16 +137,16 @@ for k in range(10):
                                                 uncertainty)
             feed_dict.update({placeholders['dropout']: 0.0})
             # Run single weight update
-            outs = sess.run([opt.cost, model.alpha1, model.alpha2, model.uncertainty], feed_dict=feed_dict)
+            outs = sess.run([opt.cost, model.belief1, model.belief2, model.belief3, model.uncertainty], feed_dict=feed_dict)
             # error = masked_dir_error(outs[1], outs[2], outs[3], label_1, label_2, label_3, test_mask)
-            dir_error = masked_dir_error2(outs[1], outs[2], outs[3], label_1, label_2, uncertainty, test_mask)
+            model2_error = masked_dir_error2(outs[1], outs[2], outs[3],  outs[3], label_1, label_2, label_3, uncertainty, test_mask)
             # Compute test loss
-            print("epoch:", epoch + 1, "Loss:", "{:.3f}".format(outs[0]), "error:", "{:.2f}".format(dir_error))
+            print("epoch:", epoch + 1, "Loss:", "{:.3f}".format(outs[0]), "error:", "{:.2f}".format(model2_error))
     # feed_dict = construct_feed_dict_sub(adj_norm, adj_label, features, placeholders, label_1, label_2,
     #                                     test_mask,
     #                                     uncertainty)
     # feed_dict.update({placeholders['dropout']: 0.0})
     # test_cost = sess.run(opt.cost, feed_dict=feed_dict)
-    result.append(dir_error)
+    result.append(model2_error)
     print("Optimization Finished!")
 print("final loss:", np.mean(result))

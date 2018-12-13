@@ -120,11 +120,13 @@ class OptimizerDir(object):
 
 class OptimizerDir2(object):
     def __init__(self, model, label_1, label_2, mask, label_3):
-        self.cost_alpha1 = masked_mse(model.alpha1, label_1, mask)
-        self.cost_alpha2 = masked_mse(model.alpha2, label_2, mask)
+        self.cost_belief1 = masked_mse(model.belief1, label_1, mask)
+        self.cost_belief2 = masked_mse(model.belief2, label_2, mask)
+        self.cost_belief3 = masked_mse(model.belief3, label_2, mask)
+        self.cost_b = (self.cost_belief1 + self.cost_belief2 + self.cost_belief3) / 3
         self.cost_uncertainty = masked_mse(model.uncertainty, label_3, mask)
         self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)  # Adam Optimizer
 
-        self.cost = (self.cost_alpha1 + self.cost_alpha2 + self.cost_uncertainty) / 3
+        self.cost = self.cost_b + self.cost_uncertainty
 
         self.opt_op = self.optimizer.minimize(self.cost)

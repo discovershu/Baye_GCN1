@@ -123,21 +123,13 @@ def masked_dir_error(p1, p2, p3, l1, l2, l3, mask):
     return np.mean(error)
 
 
-def masked_dir_error2(p1, p2, un_p, l1, l2, uncertainty, mask):
-    num = 3 / uncertainty
-    num_p = 3 / un_p
-    p3 = 1 - p1 - p2
-    l3 = 1 - l1 - l2
-    alpha1_p = num_p * p1
-    alpha2_p = num_p * p2
-    alpha3_p = num_p * p3
-    alpha1 = num * l1
-    alpha2 = num * l2
-    alpha3 = num * l3
-    e1 = np.square(alpha1_p - alpha1)
-    e2 = np.square(alpha2_p - alpha2)
-    e3 = np.square(alpha3_p - alpha3)
-    error = (e1 + e2 + e3) / 3
+def masked_dir_error2(p1, p2, p3, un_p, l1, l2, l3, uncertainty, mask):
+    b1 = np.square(p1 - l1)
+    b2 = np.square(p2 - l2)
+    b3 = np.square(p3 - l3)
+    b = (b1 + b2 + b3) / 3.0
+    un = np.square(un_p - uncertainty)
+    error = b + un
     mask = np.asarray(mask, dtype=float)
     mask /= np.mean(mask)
     error *= mask

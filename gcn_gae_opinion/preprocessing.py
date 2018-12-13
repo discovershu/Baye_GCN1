@@ -305,17 +305,17 @@ def mask_test_syn_sub_dif(test_rat, T):
     return label_1, label_2, label_3, train_mask, test_mask
 
 
-def mask_test_syn_sub_dif2(test_rat, T):
-    label = np.load("/network/rit/lab/ceashpc/xujiang/project/Dir_synthitic/label_38_dif.npy")
-    # label = features_[:T]
-    # label = np.sum(label, axis=0) + 1
+def mask_test_syn_sub_dif2(test_rat, T, seed):
+    label = np.load("/network/rit/lab/ceashpc/xujiang/project/Dir_synthitic/label_38.npy")
+    label = label[:T]
+    label = np.sum(label, axis=0) + 1
     obs_num = np.sum(label, axis=1, dtype=float)
     obs_num = np.reshape(obs_num, [-1, 1])
     uncertainty = float(3) / obs_num
     obs_num = np.concatenate([obs_num, obs_num, obs_num], axis=1)
 
-    label = label / obs_num
-    random.seed(132)
+    label = label / obs_num - 1.0/obs_num
+    random.seed(T)
     test_num = int(test_rat * len(label))
     test_index = random.sample(range(len(label)), test_num)
     label_1 = label[:, 0]

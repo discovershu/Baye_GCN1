@@ -387,14 +387,14 @@ class GCNModelDir2(Model):
                                               dropout=self.dropout,
                                               logging=self.logging)(self.inputs)
 
-        self.alpha1 = GraphConvolution(input_dim=FLAGS.hidden1,
+        self.belief1 = GraphConvolution(input_dim=FLAGS.hidden1,
                                        output_dim=FLAGS.hidden2,
                                        adj=self.adj,
                                        act=tf.nn.sigmoid,
                                        dropout=self.dropout,
                                        logging=self.logging)(self.hidden1)
 
-        self.alpha2 = GraphConvolution(input_dim=FLAGS.hidden1,
+        self.belief2 = GraphConvolution(input_dim=FLAGS.hidden1,
                                        output_dim=FLAGS.hidden2,
                                        adj=self.adj,
                                        act=tf.nn.sigmoid,
@@ -407,3 +407,4 @@ class GCNModelDir2(Model):
                                             act=tf.nn.sigmoid,
                                             dropout=self.dropout,
                                             logging=self.logging)(self.hidden1)
+        self.belief3 = tf.nn.relu(1.0 - self.belief1 - self.belief2)
